@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans" xmlns:batch="http://www.springframework.org/schema/batch"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+    <!-- spring batch context -->
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close" lazy-init="true">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="maximumPoolSize" value="${jdbc.maximumPoolSize}"/>
+        <property name="maxLifetime" value="${jdbc.maxLifetime}"/>
+        <property name="minimumIdle" value="${jdbc.minimumIdle}"/>
+        <property name="idleTimeout" value="${jdbc.idleTimeout}"/>
+        <property name="connectionTestQuery" value="${jdbc.connectionTestQuery}"/>
+        <property name="poolName" value="${batch.jdbc.poolName}" />
+        <property name="jdbcUrl" value="${batch.jdbc.url}" />
+        <property name="username" value="${batch.jdbc.username}" />
+        <property name="password" value="${batch.jdbc.password}" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <batch:job-repository id="jobRepository" data-source="dataSource" isolation-level-for-create="DEFAULT" transaction-manager="transactionManager" />
+
+    <!--<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />-->
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <property name="jobRepository" ref="jobRepository" />
+    </bean>
+    <bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+        <property name="jobRegistry" ref="jobRegistry" />
+    </bean>
+
+    <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+    <!-- spring batch context -->
+
+    <bean id="echoTasklet" class="com.suntomor.springbatch.tasklet.EchoTasklet" />
+    <batch:job id="echoBatchJob">
+        <batch:step id="stepEcho">
+            <batch:tasklet ref="echoTasklet"/>
+        </batch:step>
+    </batch:job>
+
+</beans>

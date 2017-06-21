@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" lazy-init="false">
+        <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
+        <property name="overwriteExistingJobs" value="true" />
+        <!-- 自动启动 -->
+        <property name="autoStartup" value="true"/>
+        <property name="triggers">
+            <list>
+                <ref local="echoJob" />
+            </list>
+        </property>
+    </bean>
+
+    <!-- run every 10 seconds -->
+    <bean id="echoJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.suntomor.springbatch.job.EchoQuartzJob" />
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="jobName" value="echoBatchJob" />
+            </map>
+        </property>
+    </bean>
+    <bean id="echoJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="echoJobDetail" />
+        <property name="cronExpression" value="0/10 * * * * ?"/>
+    </bean>
+
+    <import resource="classpath:spring/tasklet-context.xml" />
+
+</beans>

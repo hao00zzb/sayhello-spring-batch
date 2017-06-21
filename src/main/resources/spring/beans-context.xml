@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+    <!-- 配置线程池 -->
+    <bean id="asyncTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean">
+        <!-- 核心线程数 -->
+        <property name="corePoolSize" value="${task.executor.core.pool.size}"/>
+        <!-- 空闲线程超时时间 -->
+        <property name="keepAliveSeconds" value="${task.executor.keep.alive.seconds}"/>
+        <!-- 最大线程数 -->
+        <property name="maxPoolSize" value="${task.executor.max.pool.size}"/>
+        <!-- 保证线程全部执行完毕，再去关闭线程池 -->
+        <property name="waitForTasksToCompleteOnShutdown" value="true"/>
+    </bean>
+
+</beans>
